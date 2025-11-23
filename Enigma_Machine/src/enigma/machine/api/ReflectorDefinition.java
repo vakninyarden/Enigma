@@ -1,6 +1,6 @@
 package enigma.machine.api;
 
 public interface ReflectorDefinition {
-    int getReflectorId();
+    String getReflectorId();
     int reflect(int inputIndex);
 }
