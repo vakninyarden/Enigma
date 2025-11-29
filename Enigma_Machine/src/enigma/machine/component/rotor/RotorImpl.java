@@ -1,0 +1,69 @@
+package enigma.machine.component.rotor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class RotorImpl implements Rotor {
+private final int id;
+private final int notchPosition;
+private int currentPosition;
+private final int sizeOfAlphabet;
+private final int originalPosition;
+private final List<Character> rightMapping;
+private final List<Character> leftMapping;
+
+    public RotorImpl(int id, int notchPosition, int originalPosition,
+                     List<Character> rightMapping, List<Character> leftMapping) {
+        this.rightMapping = rightMapping;
+        this.leftMapping = leftMapping;
+        this.sizeOfAlphabet = rightMapping.size();
+        this.originalPosition = originalPosition;
+        this.id = id;
+        this.notchPosition = notchPosition;
+        this.currentPosition = originalPosition;
+    }
+
+    @Override
+    public int getRotorId() {
+        return id;
+    }
+    /*
+    @Override
+    public int getNotchIndex() {
+        return notchPosition;
+    }*/
+
+    @Override
+    public int mapping(int indexInRotor, Direction direction) {
+        int shifted = (indexInRotor + currentPosition) % sizeOfAlphabet;
+        char outChar;
+        int mapped;
+        if (direction == Direction.FORWARD) {
+            outChar = rightMapping.get(shifted);
+            mapped = leftMapping.indexOf(outChar);
+        }
+        else {
+            outChar = leftMapping.get(shifted);
+            mapped = rightMapping.indexOf(outChar);
+        }
+        return (mapped - currentPosition + sizeOfAlphabet) % sizeOfAlphabet;
+    }
+
+
+    @Override
+    public boolean atNotch() {
+        return currentPosition == notchPosition;
+    }
+
+    @Override
+    public void step() {
+        currentPosition = (currentPosition + 1) % sizeOfAlphabet;
+    }
+
+    @Override
+    public void reset() {
+        currentPosition = originalPosition;
+    }
+
+}

@@ -1,70 +1,36 @@
 package enigma.machine.component.machine;
 
 import enigma.machine.component.keyboard.KeyBoard;
-import enigma.machine.component.reflector.Reflector;
+import enigma.machine.component.reflector.ReflectorImpl;
 import enigma.machine.component.rotor.Direction;
-import enigma.machine.component.rotor.Rotor;
 import enigma.machine.component.setting.Setting;
+import enigma.machine.component.rotor.Rotor;
 
 import java.util.List;
 
 
 public class EnigmaMachineImpl implements EnigmaMachine {
-    private final List<Rotor> activeRotors;
-    private final Reflector reflector;
+
     private final KeyBoard keyboard;
     private Setting setting;
     
-    public EnigmaMachineImpl(List<Rotor> activeRotors, Reflector reflector, KeyBoard keyboard) {
+    public EnigmaMachineImpl(KeyBoard keyboard, Setting setting) {
         this.keyboard = keyboard;
-        this.activeRotors = activeRotors;
-        this.reflector = reflector;
+        this.setting = setting;
     }
-
 
     @Override
     public void resetMachine() {
-        for (Rotor rotor : activeRotors) {
-            rotor.reset();
+        for (Setting.RotorPosition rotors : setting.getActiveRotors() ){
+            rotors.rotor.reset();
         }
     }
 
     @Override
     public void machineSettings(Setting settings) {
-        
+        this.setting = settings;
     }
 
- //   @Override
-/*
-    public char processLatter(char latter) {
-        int intermediate = keyboard.processCharacter(latter);
-        int n = getRotorCount();
-        boolean[] willStep = new boolean[n];
-        willStep[n - 1] = true;
-        int i = n-1;
-        while (i>0 && willStep[i]) {
-            if (activeRotors.get(i).atNotch()) {
-                willStep[i - 1] = true;
-            }
-            i--;
-        }
-        for (int j = 0; j < n; j++) {
-            if (willStep[j]) {
-                activeRotors.get(j).step();
-            }
-        }
-        int signalIndex = alphabet.toIndex(latter);
-        for (i = n - 1; i >= 0; i--) {
-            signalIndex = activeRotors.get(i).rightToLeftMapping(signalIndex);
-        }
-        signalIndex = reflector.reflect(signalIndex);
-        for (i = 0; i < n; i++) {
-            signalIndex = activeRotors.get(i).leftToRightMapping(signalIndex);
-        }
-        char encryptedChar = alphabet.toChar(signalIndex);
-        return encryptedChar;
-    }
-*/
     @Override
     public char processLatter(char latter) {
         int intermediate = keyboard.processCharacter(latter);
@@ -72,8 +38,8 @@ public class EnigmaMachineImpl implements EnigmaMachine {
 
         rotorsStep(rotors);
         intermediate = moveForward(rotors, intermediate);
-        intermediate = reflector.reflect(intermediate);
-        intermediate = moveBackward(rotors, intermediate);
+        intermediate = setting.getReflector().reflect(intermediate+1)-1;
+        intermediate = moveBackward(rotors, intermediate );
         return keyboard.lightALamp(intermediate);
     }
 
@@ -102,7 +68,5 @@ public class EnigmaMachineImpl implements EnigmaMachine {
         } while (shouldStepNext && rotorIndex < rotors.size());
     }
 
-    int getRotorCount() {
-        return activeRotors.size();
-    }
+
 }

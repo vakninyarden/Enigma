@@ -1,13 +1,16 @@
 package enigma.machine.component.setting;
 
 import enigma.machine.component.reflector.Reflector;
-import enigma.machine.component.rotor.Rotor;
-
 import java.util.List;
 
 public class SettingImpl implements Setting {
     private Reflector reflector;
     private List<RotorPosition> activeRotors;
+
+    public SettingImpl(Reflector reflector, List<RotorPosition> activeRotors) {
+        this.reflector = reflector;
+        this.activeRotors = activeRotors;
+    }
 
     @Override
     public Reflector getReflector() {
