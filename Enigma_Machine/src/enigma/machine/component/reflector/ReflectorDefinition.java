@@ -1,4 +1,4 @@
-package enigma.machine.api;
+package enigma.machine.component.reflector;
 
 public interface ReflectorDefinition {
     String getReflectorId();

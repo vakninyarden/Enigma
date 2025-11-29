@@ -1,5 +1,4 @@
-package enigma.machine.components;
-import enigma.machine.api.ReflectorDefinition;
+package enigma.machine.component.reflector;
 import java.util.Map;
 
 //todo::: check xml implementetion and create map
