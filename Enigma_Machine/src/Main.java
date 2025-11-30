@@ -2,7 +2,6 @@ import enigma.machine.component.keyboard.KeyBoard;
 import enigma.machine.component.keyboard.KeyBoardImpl;
 import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.reflector.ReflectorImpl;
-import enigma.machine.component.rotor.Direction;
 import enigma.machine.component.rotor.Rotor;
 import enigma.machine.component.rotor.RotorImpl;
 import enigma.machine.component.setting.Setting;
@@ -67,6 +66,7 @@ public class Main {
         leftMapping3.add('C');
         leftMapping3.add('A');
 
+        // given notch -1
         Rotor rotor1 = new RotorImpl(1, 3, 2, rightMapping1, leftMapping1);
         Rotor rotor2 = new RotorImpl(2, 0, 2, rightMapping3, leftMapping3);
         Rotor rotor3 = new RotorImpl(3, 2, 2, rightMapping2, leftMapping2);

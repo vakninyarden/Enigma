@@ -8,7 +8,6 @@ public class RotorImpl implements Rotor {
 private final int id;
 private final int notchPosition;
 private int currentPosition;
-private final int sizeOfAlphabet;
 private final int originalPosition;
 private final List<Character> rightMapping;
 private final List<Character> leftMapping;
@@ -17,7 +16,6 @@ private final List<Character> leftMapping;
                      List<Character> rightMapping, List<Character> leftMapping) {
         this.rightMapping = rightMapping;
         this.leftMapping = leftMapping;
-        this.sizeOfAlphabet = rightMapping.size();
         this.originalPosition = originalPosition;
         this.id = id;
         this.notchPosition = notchPosition;
@@ -36,6 +34,7 @@ private final List<Character> leftMapping;
 
     @Override
     public int mapping(int indexInRotor, Direction direction) {
+        int sizeOfAlphabet = rightMapping.size();
         int shifted = (indexInRotor + currentPosition) % sizeOfAlphabet;
         char outChar;
         int mapped;
@@ -58,6 +57,7 @@ private final List<Character> leftMapping;
 
     @Override
     public void step() {
+        int sizeOfAlphabet = rightMapping.size();
         currentPosition = (currentPosition + 1) % sizeOfAlphabet;
     }
 

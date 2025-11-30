@@ -38,7 +38,7 @@ public class EnigmaMachineImpl implements EnigmaMachine {
 
         rotorsStep(rotors);
         intermediate = moveForward(rotors, intermediate);
-        intermediate = setting.getReflector().reflect(intermediate+1)-1;
+        intermediate = setting.getReflector().reflect(intermediate +1) -1;
         intermediate = moveBackward(rotors, intermediate );
         return keyboard.lightALamp(intermediate);
     }
