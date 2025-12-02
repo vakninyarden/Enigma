@@ -86,6 +86,11 @@ public class ConsoleUI {
     private void handleShowCurrentMachineStatus() {
         // כאן תקראי ל-engine ו"תדפיסי" את הסטטוס
         DtoMachineSpecification spec = engine.showMachineDetails();
+        System.out.println(spec.getNumOfRotors());
+        System.out.println(spec.getNumOfReflectors());
+        System.out.println(spec.getNumOfMessages());
+        System.out.println(spec.getOriginalCode());
+        System.out.println(spec.getCurrentCode());
     }
 
     private void handleManualCodeSelection() {

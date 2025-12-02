@@ -16,19 +16,19 @@ public class DtoMachineSpecification {
         this.originalCode = originalCode;
     }
 
-    int getNumOfRotors() {
+    public int getNumOfRotors() {
         return numOfRotors;
     }
-    int getNumOfReflectors() {
+    public int getNumOfReflectors() {
         return numOfReflectors;
     }
-    int getNumOfMessages() {
+    public int getNumOfMessages() {
         return numOfMessages;
     }
-    DtoCurrentCode getCurrentCode() {
+    public DtoCurrentCode getCurrentCode() {
         return currentCode;
     }
-    DtoOriginalCode getOriginalCode() {
+    public DtoOriginalCode getOriginalCode() {
         return originalCode;
     }
 

@@ -11,7 +11,7 @@ public class EngineImpl implements Engine {
     private StatisticsManager statisticsManager;
     private Repository repository;
     private static int messageCount = 0;
-
+    private DtoMachineSpecification dtoMachineSpecification;
 
     @Override
     public void loadXml(String path) {
@@ -31,7 +31,7 @@ public class EngineImpl implements Engine {
     public DtoMachineSpecification showMachineDetails() {
         DtoCurrentCode dtoCurrentCode = new DtoCurrentCode();
         DtoOriginalCode dtoOriginalCode = new DtoOriginalCode();
-        DtoMachineSpecification dtoMachineSpecification = new DtoMachineSpecification(repository.getRotorCount(), repository.getReflectorCount(),messageCount, dtoCurrentCode, dtoOriginalCode);
+        dtoMachineSpecification = new DtoMachineSpecification(repository.getRotorCount(), repository.getReflectorCount(),messageCount, dtoCurrentCode, dtoOriginalCode);
 
 
         return dtoMachineSpecification;
