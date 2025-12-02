@@ -15,14 +15,17 @@ import java.io.InputStream;
 public class LoadManager {
     private static final String JAXB_XML_GAME_PACKAGE_NAME = "bte.component.jaxb";
 
-    public void LoadXmlToObject(String xmlNameFile) {
+
+    public BTEEnigma loadXmlToObject(String xmlNameFile) {
         try {
             InputStream inputStream = new FileInputStream(new File(xmlNameFile));
             BTEEnigma machine = deserializeFrom(inputStream);
             System.out.println("Successfully loaded XML to object: " + machine);
+            return machine;
         } catch (JAXBException | FileNotFoundException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     private static BTEEnigma deserializeFrom(InputStream in) throws JAXBException {
@@ -35,8 +38,11 @@ public class LoadManager {
         File file = new File(filePath);
         return file.exists() && file.isFile() && isXmlFile(filePath);
     }
-
     public boolean isXmlFile(String filePath) {
         return filePath.toLowerCase().endsWith(".xml");
     }
+
+
+
+
 };

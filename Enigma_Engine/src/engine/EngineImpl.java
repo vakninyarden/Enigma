@@ -1,7 +1,7 @@
 package engine;
 
 import enigma.machine.component.machine.EnigmaMachine;
-import enigma.machine.component.rotor.Rotor;
+
 
 public class EngineImpl implements Engine {
     private EnigmaMachine machine;
@@ -9,10 +9,19 @@ public class EngineImpl implements Engine {
     private StatisticsManager statisticsManager;
     private Repository repository;
 
+    public EngineImpl( LoadManager loadManager ){
+
+        this.loadManager = loadManager;
+
+    }
 
     @Override
     public void loadXml(String path) {
-
+        /*if(!loadManager.isFileExistsAndIsXml(path)){
+            System.out.println("File does not exist or is not an XML file.");
+            return;
+        }*/
+        loadManager.loadXmlToObject(path);
     }
 
     @Override
