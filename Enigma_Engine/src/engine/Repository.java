@@ -52,7 +52,12 @@ public class Repository {
         }
         return new RotorImpl(id, notch, rightMapping, leftMapping);
     }
-
+ int getRotorCount() {
+        return rotors.size();
+    }
+    int getReflectorCount() {
+        return reflectors.size();
+    }
 
 
     private Map<String, Reflector> buildReflectorsRepository(BTEReflectors bteReflectors, String abc) {

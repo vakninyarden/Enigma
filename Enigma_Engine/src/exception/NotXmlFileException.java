@@ -1,4 +1,4 @@
-package engine.exception;
+package exception;
 
 public class NotXmlFileException extends FileValidationException {
     public NotXmlFileException(String filePath) {

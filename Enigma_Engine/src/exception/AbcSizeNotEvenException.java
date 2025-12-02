@@ -1,4 +1,4 @@
-package engine.exception;
+package exception;
 
 public class AbcSizeNotEvenException extends FileValidationException {
     public AbcSizeNotEvenException() {

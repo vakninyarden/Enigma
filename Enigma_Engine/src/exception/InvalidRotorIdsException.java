@@ -1,4 +1,4 @@
-package engine.exception;
+package exception;
 
 public class InvalidRotorIdsException extends FileValidationException {
     public InvalidRotorIdsException() {

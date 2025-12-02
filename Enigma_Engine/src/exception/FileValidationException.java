@@ -1,4 +1,4 @@
-package engine.exception;
+package exception;
 
 public class FileValidationException extends RuntimeException {
     public FileValidationException(String message) {

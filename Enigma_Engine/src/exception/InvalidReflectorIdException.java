@@ -1,4 +1,4 @@
-package engine.exception;
+package exception;
 
 public class InvalidReflectorIdException extends FileValidationException {
     public InvalidReflectorIdException(String reflectorId) {

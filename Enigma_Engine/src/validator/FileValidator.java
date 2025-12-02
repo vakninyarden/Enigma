@@ -1,4 +1,4 @@
-package engine.file.validator;
+package validator;
 import bte.component.jaxb.BTEEnigma;
 import bte.component.jaxb.BTEReflector;
 import bte.component.jaxb.BTERotor;

@@ -1,4 +1,4 @@
-package engine.exception;
+package exception;
 
 public class NotEnoughRotorsException extends FileValidationException {
     public NotEnoughRotorsException(int actualCount) {

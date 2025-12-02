@@ -1,4 +1,4 @@
-package engine.file.validator;
+package validator;
 
 import bte.component.jaxb.*;
 import engine.exception.*;
@@ -195,7 +195,7 @@ public class XmlFileValidator implements FileValidator {
         hasNoSelfMappingInReflector(bteEnigma.getBTEReflectors().getBTEReflector());
     }
     public void ValidateFilePath(String filePath) {
-        isFileExists(filePath);
         validateIsXmlFile(filePath);
+        isFileExists(filePath);
     }
 }
