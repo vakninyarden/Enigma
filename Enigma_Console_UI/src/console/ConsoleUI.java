@@ -9,7 +9,7 @@ public class ConsoleUI {
         this.engine = engine;
     }
 
-    void showMainMenu() {
+    void showMenu() {
 
     }
 }

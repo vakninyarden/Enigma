@@ -8,19 +8,26 @@ public class RotorImpl implements Rotor {
 private final int id;
 private final int notchPosition;
 private int currentPosition;
-private final int originalPosition;
+private  int originalPosition;
 private final List<Character> rightMapping;
 private final List<Character> leftMapping;
 
-    public RotorImpl(int id, int notchPosition, int originalPosition,
+
+
+    public RotorImpl(int id, int notchPosition,
                      List<Character> rightMapping, List<Character> leftMapping) {
         this.rightMapping = rightMapping;
         this.leftMapping = leftMapping;
-        this.originalPosition = originalPosition;
+        this.originalPosition = 0;
         this.id = id;
         this.notchPosition = notchPosition;
+        this.currentPosition = 0;
+    }
+    public void setOriginalPosition(int originalPosition) {
+        this.originalPosition= originalPosition;
         this.currentPosition = originalPosition;
     }
+
 
     @Override
     public int getRotorId() {
@@ -66,4 +73,13 @@ private final List<Character> leftMapping;
         currentPosition = originalPosition;
     }
 
+    public List<Character> getRightMapping() {
+        return rightMapping;
+    }
+
+    public List<Character> getLeftMapping() {
+        return leftMapping;
+    }
+
 }
+

@@ -3,17 +3,18 @@ import java.util.Map;
 
 
 public class ReflectorImpl implements Reflector {
-   private final int reflectorId;
+   private final String reflectorId;
    private final Map<Integer, Integer> mapping;
 
-    public ReflectorImpl(int reflectorId, Map<Integer, Integer> mapping) {
+//
+    public ReflectorImpl(String reflectorId, Map<Integer, Integer> mapping) {
         this.reflectorId = reflectorId;
         this.mapping = mapping;
     }
 
     @Override
     public String getReflectorId() {
-        return toRoman(reflectorId);
+        return reflectorId;
     }
 
     @Override
@@ -21,7 +22,7 @@ public class ReflectorImpl implements Reflector {
         return mapping.get(inputIndex);
     }
 
-    public static String toRoman(int num) {
+    /*public static String toRoman(int num) {
         switch (num) {
             case 1: return "I";
             case 2: return "II";
@@ -30,7 +31,7 @@ public class ReflectorImpl implements Reflector {
             case 5: return "V";
             default: throw new IllegalArgumentException("Number must be between 1 and 5");
         }
-    }
+    }*/
 
 //    public static String toRoman(int num) {
 //        if (num < 1 || num > 3999) {
@@ -54,6 +55,9 @@ public class ReflectorImpl implements Reflector {
 //    }
 
 
+    public Map<Integer, Integer> getMapping() {
+       return mapping;
+    }
 
 
 

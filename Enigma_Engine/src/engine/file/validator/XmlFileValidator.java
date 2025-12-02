@@ -1,28 +1,55 @@
 package engine.file.validator;
 
 import bte.component.jaxb.*;
+import engine.exception.*;
 
-import javax.xml.validation.Validator;
-import java.util.List;
-import java.util.HashSet;
-import java.util.Set;
-import java.lang.String;
+import java.io.File;
+import java.util.*;
 
 public class XmlFileValidator implements FileValidator {
+
+    // 1. קובץ קיים
+    public boolean isFileExists(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists() || !file.isFile()) {
+            throw new FileDoesNotExistException(filePath);
+        }
+        return true;
+    }
+
+    // 2. קובץ XML
+    public boolean validateIsXmlFile(String filePath) {
+        if (!filePath.toLowerCase().endsWith(".xml")) {
+            throw new NotXmlFileException(filePath);
+        }
+        return true;
+
+    }
+
+    // 3. גודל ABC זוגי
     @Override
     public boolean isAbcSizeEven(String abc) {
-        return abc.length() % 2 == 0;
+        if (abc.length() % 2 != 0) {
+            throw new AbcSizeNotEvenException();
+        }
+        return true;
     }
 
+    // 4. לפחות 3 רוטורים
     @Override
     public boolean hasAtLeastThreeRotors(List<BTERotor> rotors) {
-        return rotors.size() >= 3;
+        if (rotors.size() < 3) {
+            throw new NotEnoughRotorsException(rotors.size());
+        }
+        return true;
     }
 
+    // 5. IDs רציפים וייחודיים
     @Override
     public boolean hasValidRotorIds(List<BTERotor> rotors) {
+
         if (rotors == null || rotors.isEmpty()) {
-            return false; // אין רוטורים → לא תקין
+            throw new InvalidRotorIdsException();
         }
 
         Set<Integer> ids = new HashSet<>();
@@ -32,60 +59,72 @@ public class XmlFileValidator implements FileValidator {
             int id = rotor.getId();
 
             if (id <= 0) {
-                return false;
+                throw new InvalidRotorIdsException();
             }
 
             if (!ids.add(id)) {
-                return false;
+                throw new InvalidRotorIdsException();
             }
 
-            if (id > maxId) {
-                maxId = id;
-            }
+            maxId = Math.max(maxId, id);
         }
 
-        return ids.size() == rotors.size() && maxId == ids.size();
+        if (maxId != ids.size()) {
+            throw new InvalidRotorIdsException();
+        }
+
+        return true;
     }
 
+    // 6. אין מיפויים כפולים ברוטור
+    @Override
     public boolean hasNoDuplicateMappingsInRotor(List<BTERotor> rotors) {
+
         for (BTERotor rotor : rotors) {
+
             Set<Character> leftInputs = new HashSet<>();
             Set<Character> rightInputs = new HashSet<>();
-            List<BTEPositioning> posList = rotor.getBTEPositioning();
 
-            for (BTEPositioning p : posList) {
+            for (BTEPositioning p : rotor.getBTEPositioning()) {
                 String left = p.getLeft();
                 for (int i = 0; i < left.length(); i++) {
                     if (!leftInputs.add(left.charAt(i))) {
-                        return false;
+                        throw new DuplicateRotorMappingException(rotor.getId());
                     }
                 }
+
                 String right = p.getRight();
                 for (int i = 0; i < right.length(); i++) {
                     if (!rightInputs.add(right.charAt(i))) {
-                        return false;
+                        throw new DuplicateRotorMappingException(rotor.getId());
                     }
                 }
             }
         }
+
         return true;
     }
 
+    // 7. זיז הפסיעה בטווח
     @Override
     public boolean isNotchPositionInRange(List<BTERotor> rotors, String abc) {
+
         for (BTERotor rotor : rotors) {
             int notchPosition = rotor.getNotch();
             if (notchPosition < 0 || notchPosition >= abc.length()) {
-                return false;
+                throw new NotchOutOfRangeException(rotor.getId());
             }
         }
+
         return true;
     }
 
+    // 8. מזהי רפלקטורים תקינים (I..V)
     @Override
     public boolean hasValidReflectorIds(List<BTEReflector> reflectors) {
+
         if (reflectors == null || reflectors.isEmpty()) {
-            return false;
+            throw new InvalidReflectorIdException("NULL/EMPTY");
         }
 
         Set<Integer> ids = new HashSet<>();
@@ -95,53 +134,68 @@ public class XmlFileValidator implements FileValidator {
             int id = romanToInt(reflector.getId());
 
             if (id <= 0) {
-                return false;
+                throw new InvalidReflectorIdException(reflector.getId());
             }
 
             if (!ids.add(id)) {
-                return false;
+                throw new InvalidReflectorIdException(reflector.getId());
             }
 
-            if (id > maxId) {
-                maxId = id;
+            maxId = Math.max(maxId, id);
+        }
+
+        if (maxId != ids.size()) {
+            throw new InvalidReflectorIdException("Non-sequential IDs");
+        }
+
+        return true;
+    }
+
+    // 9. אין מיפוי של אות לעצמה ברפלקטור
+    @Override
+    public boolean hasNoSelfMappingInReflector(List<BTEReflector> reflectors) {
+
+        for (BTEReflector refl : reflectors) {
+            for (BTEReflect mapping : refl.getBTEReflect()) {
+                if (mapping.getInput() == mapping.getOutput()) {
+                    throw new ReflectorSelfMappingException(
+                            String.valueOf(mapping.getInput()),
+                            refl.getId()
+                    );
+                }
             }
         }
 
-        return ids.size() == reflectors.size() && maxId == ids.size();
+        return true;
     }
 
-    @Override
-    public boolean hasNoSelfMappingInReflector(List<BTEReflector> reflector) {
-         for (BTEReflector refl : reflector) {
-             for (BTEReflect bteReflect : refl.getBTEReflect()) {
-                 if (bteReflect.getInput() == bteReflect.getOutput()) {
-                     return false;
-                 }
-             }
-         }
-         return true;
-    }
-
+    // כלי עזר
     public int romanToInt(String roman) {
         if (roman == null) {
-            throw new IllegalArgumentException("roman is null");
+            return -1;
         }
 
         switch (roman) {
-            case "I":
-                return 1;
-            case "II":
-                return 2;
-            case "III":
-                return 3;
-            case "IV":
-                return 4;
-            case "V":
-                return 5;
-            default:
-                return -1;
+            case "I":   return 1;
+            case "II":  return 2;
+            case "III": return 3;
+            case "IV":  return 4;
+            case "V":   return 5;
+            default:    return -1;
         }
     }
 
-
+    public void ValidateAll( BTEEnigma bteEnigma) {
+        isAbcSizeEven(bteEnigma.getABC());
+        hasAtLeastThreeRotors(bteEnigma.getBTERotors().getBTERotor());
+        hasValidRotorIds(bteEnigma.getBTERotors().getBTERotor());
+        hasNoDuplicateMappingsInRotor(bteEnigma.getBTERotors().getBTERotor());
+        isNotchPositionInRange(bteEnigma.getBTERotors().getBTERotor(), bteEnigma.getABC());
+        hasValidReflectorIds(bteEnigma.getBTEReflectors().getBTEReflector());
+        hasNoSelfMappingInReflector(bteEnigma.getBTEReflectors().getBTEReflector());
+    }
+    public void ValidateFilePath(String filePath) {
+        isFileExists(filePath);
+        validateIsXmlFile(filePath);
+    }
 }

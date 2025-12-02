@@ -1,5 +1,8 @@
 package engine;
 
+import bte.component.jaxb.BTEEnigma;
+import engine.file.validator.FileValidator;
+import engine.file.validator.XmlFileValidator;
 import enigma.machine.component.machine.EnigmaMachine;
 
 
@@ -9,20 +12,19 @@ public class EngineImpl implements Engine {
     private StatisticsManager statisticsManager;
     private Repository repository;
 
-    public EngineImpl( LoadManager loadManager ){
-
-        this.loadManager = loadManager;
-
-    }
 
     @Override
     public void loadXml(String path) {
-        /*if(!loadManager.isFileExistsAndIsXml(path)){
-            System.out.println("File does not exist or is not an XML file.");
-            return;
-        }*/
-        loadManager.loadXmlToObject(path);
+        XmlFileValidator validator = new XmlFileValidator();
+        validator.ValidateFilePath(path);
+
+        BTEEnigma bteMachine = loadManager.loadXmlToObject(path);
+        validator.ValidateAll(bteMachine);
+        repository = new Repository(bteMachine.getABC());
+        repository.loadToRepository(bteMachine);
+        repository.printRepositoryContents();
     }
+
 
     @Override
     public void showMachineDetails() {

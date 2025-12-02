@@ -1,4 +1,5 @@
 package engine.file.validator;
+import bte.component.jaxb.BTEEnigma;
 import bte.component.jaxb.BTEReflector;
 import bte.component.jaxb.BTERotor;
 
@@ -6,6 +7,8 @@ import bte.component.jaxb.BTERotor;
 import java.util.List;
 
 public interface FileValidator {
+    public boolean isFileExists(String filePath);
+
     // 1. גודל ה-ABC הוא זוגי
     boolean isAbcSizeEven(String abc);
 
@@ -26,4 +29,6 @@ public interface FileValidator {
 
     // 7. אין מיפוי של אות לעצמה בשום רפלקטור
     boolean hasNoSelfMappingInReflector(List<BTEReflector> reflector);
+
+    public void ValidateAll(BTEEnigma bteEnigma);
 }

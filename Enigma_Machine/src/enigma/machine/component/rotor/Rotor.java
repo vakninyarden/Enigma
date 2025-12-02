@@ -1,5 +1,7 @@
 package enigma.machine.component.rotor;
 
+import java.util.List;
+
 public interface Rotor {
     int getRotorId();
     // int getNotchIndex();
@@ -8,4 +10,6 @@ public interface Rotor {
     void step();
     void reset();
 
-}
+    public List<Character> getRightMapping() ;
+    public List<Character> getLeftMapping() ;
+    }

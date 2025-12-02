@@ -13,14 +13,13 @@ import java.io.InputStream;
 
 
 public class LoadManager {
-    private static final String JAXB_XML_GAME_PACKAGE_NAME = "bte.component.jaxb";
-
 
     public BTEEnigma loadXmlToObject(String xmlNameFile) {
         try {
             InputStream inputStream = new FileInputStream(new File(xmlNameFile));
             BTEEnigma machine = deserializeFrom(inputStream);
-            System.out.println("Successfully loaded XML to object: " + machine);
+            cleanMachine(machine);
+            //System.out.println("Successfully loaded XML to object: " + machine);
             return machine;
         } catch (JAXBException | FileNotFoundException e) {
             e.printStackTrace();
@@ -29,18 +28,22 @@ public class LoadManager {
     }
 
     private static BTEEnigma deserializeFrom(InputStream in) throws JAXBException {
-        JAXBContext jc = JAXBContext.newInstance(JAXB_XML_GAME_PACKAGE_NAME);
+        JAXBContext jc = JAXBContext.newInstance(BTEEnigma.class);
         Unmarshaller u = jc.createUnmarshaller();
         return (BTEEnigma) u.unmarshal(in);
     }
+    private void cleanMachine(BTEEnigma machine) {
+        if(machine == null) {return;}
 
-    public boolean isFileExistsAndIsXml(String filePath) {
-        File file = new File(filePath);
-        return file.exists() && file.isFile() && isXmlFile(filePath);
+        String  abc = machine.getABC();
+        if(abc!=null){
+            machine.setABC(abc.trim());
+
+        }
+
     }
-    public boolean isXmlFile(String filePath) {
-        return filePath.toLowerCase().endsWith(".xml");
-    }
+
+
 
 
 
