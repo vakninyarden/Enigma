@@ -70,17 +70,17 @@ public class ConsoleUI {
     }
 
     private void handleLoadMachineFromXml  () {
-        String path = readNonEmptyLine("Please enter the XML file full path:");
-        try{
-            engine.loadXml(path);
-            System.out.println("Machine loaded successfully from: " + path);
-        }
-        catch (FileValidationException e){
-            System.out.println("Error loading machine: " + e.getMessage());
-        }
-        catch (Exception e){
-            System.out.println("An unexpected error occurred: " + e.getMessage());
-        }
+         String path = readNonEmptyLine("Please enter the XML file full path:");
+         try{
+             engine.loadXml(path);
+                System.out.println("Machine loaded successfully from: " + path);
+         }
+            catch (FileValidationException e){
+                System.out.println("Error loading machine: " + e.getMessage());
+         }
+           catch (Exception e){
+                System.out.println("An unexpected error occurred: " + e.getMessage());
+           }
     }
 
     private void handleShowCurrentMachineStatus() {

@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/DTO/DTO.iml" filepath="$PROJECT_DIR$/DTO/DTO.iml" />
       <module fileurl="file://$PROJECT_DIR$/Enigma.iml" filepath="$PROJECT_DIR$/Enigma.iml" />
       <module fileurl="file://$PROJECT_DIR$/Enigma_Console_UI/Enigma_Console_UI.iml" filepath="$PROJECT_DIR$/Enigma_Console_UI/Enigma_Console_UI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Enigma_DTO/Enigma_DTO.iml" filepath="$PROJECT_DIR$/Enigma_DTO/Enigma_DTO.iml" />
       <module fileurl="file://$PROJECT_DIR$/Enigma_Engine/Enigma_Engine.iml" filepath="$PROJECT_DIR$/Enigma_Engine/Enigma_Engine.iml" />
       <module fileurl="file://$PROJECT_DIR$/Enigma_Machine/Enigma_Machine.iml" filepath="$PROJECT_DIR$/Enigma_Machine/Enigma_Machine.iml" />
     </modules>
