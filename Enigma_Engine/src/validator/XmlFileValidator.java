@@ -1,7 +1,7 @@
 package validator;
 
 import bte.component.jaxb.*;
-import exception.*;
+import exception.fileexceoption.*;
 
 import java.io.File;
 import java.util.*;

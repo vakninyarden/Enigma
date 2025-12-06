@@ -9,17 +9,20 @@ import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
 import enigma.machine.component.setting.Setting;
 import enigma.machine.component.setting.SettingImpl;
+import validator.FileValidator;
+import validator.InputValidator;
 import validator.XmlFileValidator;
 import enigma.machine.component.machine.EnigmaMachine;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 
 public class EngineImpl implements Engine {
     private final int NUMBER_OF_ROTORS = 3;
-    private final int NUMBER_OF_REFLECTORS = 5;
 
     private EnigmaMachine machine;
     private LoadManager loadManager;
@@ -128,6 +131,7 @@ public class EngineImpl implements Engine {
 
     @Override
     public String processMessage(String message) {
+        InputValidator.validateMessageInput(message, repository.getAbc());
         messageCount++;
         char[] result = new char[message.length()];
         for (int i = 0; i < message.length(); i++) {
@@ -138,8 +142,20 @@ public class EngineImpl implements Engine {
         return new String(result);
     }
 
+
+
     @Override
-    public void codeManual(List<Integer> rotorIds, String initialRotorsPositions, int reflectorId) {
+    public void codeManual(String line, String initialRotorsPositions, int reflectorId) {
+        InputValidator.validateRotorIds(line, NUMBER_OF_ROTORS);
+        List<Integer> rotorIds = Arrays.stream(line.split(","))
+                .map(String::trim)          // להוריד רווחים
+                .map(Integer::parseInt)     // להפוך ל־Integer
+                .collect(Collectors.toList());
+        InputValidator.validateRotorExistence(rotorIds, repository.getRotorCount());
+        InputValidator.validateDuplicateRotorIds(rotorIds);
+        InputValidator.validatePositionsLength(initialRotorsPositions,rotorIds.size(),repository.getAbc());
+        InputValidator.validateReflectorSelecttion(reflectorId);
+
         String reflectorIdStr = intToRoman(reflectorId);
         setMachineSetting(rotorIds, initialRotorsPositions, reflectorIdStr);
 
@@ -171,6 +187,7 @@ public class EngineImpl implements Engine {
     public void codeAuto() {
         Random rand = new Random();
         String initialRotorsPositions = "";
+        int numberOfReflectors = repository.getReflectorCount();
         List<Integer> rotorIds = new ArrayList<>();
         for (int i = 0; i < NUMBER_OF_ROTORS; i++) {
             int minId = 1;
@@ -178,7 +195,7 @@ public class EngineImpl implements Engine {
             initialRandomRotorId(rotorIds, rand, maxId, minId);
             initialRotorsPositions = initialRandomRotorPosition(initialRotorsPositions, rand);
         }
-        int ReflectorId = rand.nextInt((NUMBER_OF_REFLECTORS)) + 1;
+        int ReflectorId = rand.nextInt((numberOfReflectors))+1;
         String id = intToRoman(ReflectorId);
         setMachineSetting(rotorIds, initialRotorsPositions, id);
     }

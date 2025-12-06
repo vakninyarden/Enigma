@@ -1,4 +1,4 @@
-package exception;
+package exception.fileexceoption;
 
 public class DuplicateRotorMappingException extends FileValidationException {
     public DuplicateRotorMappingException(int rotorId) {

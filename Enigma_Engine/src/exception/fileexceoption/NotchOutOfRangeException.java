@@ -1,4 +1,4 @@
-package exception;
+package exception.fileexceoption;
 
 public class NotchOutOfRangeException extends FileValidationException {
     public NotchOutOfRangeException(int rotorId) {

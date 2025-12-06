@@ -3,18 +3,18 @@ package console;
 
 import dto.DtoMachineSpecification;
 import engine.Engine;
-import exception.FileValidationException;
+import exception.fileexceoption.FileValidationException;
+import exception.inputexception.InputValidationException;
+import exception.inputexception.InvalidEnigmaCharacterException;
+import validator.InputValidator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConsoleUI {
     private final Engine engine;
     private final Scanner scanner = new Scanner(System.in);
-
+    private final int NUMBER_OF_ROTORS = 3;
 
     public ConsoleUI(Engine engine) {
         this.engine = engine;
@@ -22,10 +22,16 @@ public class ConsoleUI {
 
     void showMenu() {
         boolean exit = false;
-
+        int choice = -1;
         while (!exit) {
             printMainMenu();
-            int choice = scanner.nextInt();
+            try {
+                choice = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                scanner.nextLine();
+                System.out.println("Invalid choice, please enter a number between 1-8.");
+                continue;
+            }
 
             switch (choice) {
                 case 1:
@@ -41,10 +47,10 @@ public class ConsoleUI {
                     handleAutomaticCodeSetup();
                     break;
                 case 5:
-                    handleResetToOriginalCode();
+                    handleProcessInput();
                     break;
                 case 6:
-                    handleProcessInput();
+                    handleResetToOriginalCode();
                     break;
                 case 7:
                     handleShowMachineHistory();
@@ -54,7 +60,7 @@ public class ConsoleUI {
                     System.out.println("Exiting, goodbye.");
                     break;
                 default:
-                    System.out.println("Invalid choice, please try again.");
+                    System.out.println("Invalid choice, please enter a number between 1-8.");
             }
         }
 
@@ -66,8 +72,8 @@ public class ConsoleUI {
         System.out.println("2. Get current machine status");
         System.out.println("3. Manual code selection");
         System.out.println("4. Automatic code setup");
-        System.out.println("5. Reset to original code");
-        System.out.println("6. Process input");
+        System.out.println("5. Process input");
+        System.out.println("6. Reset to original code");
         System.out.println("7. Get machine history");
         System.out.println("8. Exit");
         System.out.print("Choose option (1-8): ");
@@ -88,38 +94,47 @@ public class ConsoleUI {
     private void handleShowCurrentMachineStatus() {
         // כאן תקראי ל-engine ו"תדפיסי" את הסטטוס
         DtoMachineSpecification spec = engine.showMachineDetails();
+        System.out.println("Current machine status: ");
+        System.out.println("Amount of rotors: ");
         System.out.println(spec.getNumOfRotors());
+        System.out.println("Amount of reflectors: ");
         System.out.println(spec.getNumOfReflectors());
+        System.out.println("Number of processed messages: ");
         System.out.println(spec.getNumOfMessages());
+        System.out.println("Original Setting Code:");
         System.out.println(spec.getOriginalCode());
+        System.out.println("Current Setting Code");
         System.out.println(spec.getCurrentCode());
     }
 
     private void handleManualCodeSelection() {
-
         System.out.println("Please enter the ids of the rotor you want to use (3 rotors):");
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
 
-        List<Integer> rotorPositions = Arrays.stream(line.split(","))
-                .map(String::trim)          // להוריד רווחים
-                .map(Integer::parseInt)     // להפוך ל־Integer
-                .collect(Collectors.toList());
+//        List<Integer> rotorPositions = Arrays.stream(line.split(","))
+//                .map(String::trim)          // להוריד רווחים
+//                .map(Integer::parseInt)     // להפוך ל־Integer
+//                .collect(Collectors.toList());
 
         System.out.println("Please enter the initial positions of the rotors (from the ABC):");
         String positionsLine = scanner.nextLine();
         System.out.println("Please enter the ids of the reflector you want to use:");
         System.out.println("1 = I, 2 = II, 3 = III, 4 = IV, 5 = V");
-        int reflectorId = scanner.nextInt();
-        engine.codeManual(rotorPositions, positionsLine, reflectorId);
-
-        /*
-        rotorPositions.add(3);
-        rotorPositions.add(2);
-        rotorPositions.add(1);
-        */
-
-
+        int reflectorId;
+        try {
+             reflectorId = scanner.nextInt();
+        } catch (InputMismatchException e) {
+            scanner.nextLine();
+            System.out.println("Invalid choice, the reflector id must be a number between 1-5.");
+            return;
+        }
+        try{
+            engine.codeManual(line, positionsLine, reflectorId);
+        } catch (InputValidationException e) {
+            System.out.println("An error occurred while setting the manual code: " + e.getMessage());
+            return;
+        }
     }
 
     private void handleAutomaticCodeSetup() {
@@ -136,8 +151,13 @@ public class ConsoleUI {
         String input = readNonEmptyLine("Please enter the text to process:");
 
         input = input.toUpperCase();
-        String output = engine.processMessage(input);
-        System.out.println(output);
+        try {
+            String output = engine.processMessage(input);
+            System.out.println(output);
+        } catch (InvalidEnigmaCharacterException e) {
+            System.out.println("An error occurred while processing the message: " + e.getMessage());
+            return;
+        }
     }
 
     private void handleShowMachineHistory() {
