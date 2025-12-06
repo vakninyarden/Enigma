@@ -67,14 +67,14 @@
 //        leftMapping3.add('A');
 //
 //        // given notch -1
-//        Rotor rotor1 = new RotorImpl(1, 3, 2, rightMapping1, leftMapping1);
-//        Rotor rotor2 = new RotorImpl(2, 0, 2, rightMapping3, leftMapping3);
-//        Rotor rotor3 = new RotorImpl(3, 2, 2, rightMapping2, leftMapping2);
+//       Rotor rotor1 = new RotorImpl(1, 3, rightMapping1, leftMapping1);
+//        Rotor rotor2 = new RotorImpl(2, 0,  rightMapping3, leftMapping3);
+//        Rotor rotor3 = new RotorImpl(3, 1, rightMapping2, leftMapping2);
 //
 //        List<RotorPosition> rotors = new ArrayList<>();
-//        rotors.add(new RotorPosition(rotor1, 4));
-//        rotors.add(new RotorPosition(rotor2, 1));
-//         rotors.add(new RotorPosition(rotor3, 5));
+//        rotors.add(new RotorPosition(rotor1, 2));
+//        rotors.add(new RotorPosition(rotor2, 2));
+//         rotors.add(new RotorPosition(rotor3, 2));
 //        // 3. יצירת רפלקטור (מיפוי סימטרי פשוט לדוגמה)
 //        Map<Integer,Integer> refMap = new HashMap<>();
 //        int size = alphabet.length();
@@ -84,7 +84,7 @@
 //        refMap.put(4, 1);
 //        refMap.put(2, 5); // C <-> F
 //        refMap.put(5, 2);
-//        Reflector reflector = new ReflectorImpl(1, refMap);
+//        Reflector reflector = new ReflectorImpl("I", refMap);
 //
 //        // 4. יצירת Setting
 //        Setting setting = new SettingImpl(reflector, rotors);
@@ -93,7 +93,7 @@
 //        EnigmaMachine machine = new EnigmaMachineImpl(keyboard, setting);
 //
 //        // 6. טקסט לבדיקה
-//        String plaintext = "AAAEEEBBBDDDCCCFFF";
+//        String plaintext = "AABBCCDDEEFF";
 //        StringBuilder cipher = new StringBuilder();
 //
 //        for (char ch : plaintext.toCharArray()) {

@@ -18,7 +18,15 @@ public interface Setting {
 
         public RotorPosition(Rotor rotor, int position) {
             this.rotor = rotor;
+            this.rotor.setOriginalPosition(position);
             this.position = position;
+        }
+        public Rotor getRotor() {
+            return rotor;
+
+        }
+        public int getoriginalPosition() {
+            return position;
         }
     }
 }

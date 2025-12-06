@@ -4,17 +4,18 @@ public class DtoMachineSpecification {
     int numOfRotors;
     int numOfReflectors;
     int numOfMessages;
-    DtoCurrentCode currentCode;
-    DtoOriginalCode originalCode;
+    String currentCode;
+    String originalCode;
 
-    public DtoMachineSpecification(int numOfRotors, int numOfReflectors, int numOfMessages,
-                                   DtoCurrentCode currentCode, DtoOriginalCode originalCode) {
+    public DtoMachineSpecification(int numOfRotors, int numOfReflectors, int numOfMessages, String currentCode, String originalCode) {
         this.numOfRotors = numOfRotors;
         this.numOfReflectors = numOfReflectors;
         this.numOfMessages = numOfMessages;
         this.currentCode = currentCode;
         this.originalCode = originalCode;
     }
+
+
 
     public int getNumOfRotors() {
         return numOfRotors;
@@ -25,10 +26,10 @@ public class DtoMachineSpecification {
     public int getNumOfMessages() {
         return numOfMessages;
     }
-    public DtoCurrentCode getCurrentCode() {
+    public String getCurrentCode() {
         return currentCode;
     }
-    public DtoOriginalCode getOriginalCode() {
+    public String getOriginalCode() {
         return originalCode;
     }
 

@@ -23,6 +23,7 @@ private final List<Character> leftMapping;
         this.notchPosition = notchPosition;
         this.currentPosition = 0;
     }
+    @Override
     public void setOriginalPosition(int originalPosition) {
         this.originalPosition= originalPosition;
         this.currentPosition = originalPosition;
@@ -33,11 +34,10 @@ private final List<Character> leftMapping;
     public int getRotorId() {
         return id;
     }
-    /*
     @Override
     public int getNotchIndex() {
         return notchPosition;
-    }*/
+    }
 
     @Override
     public int mapping(int indexInRotor, Direction direction) {
@@ -81,5 +81,12 @@ private final List<Character> leftMapping;
         return leftMapping;
     }
 
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public int getOriginalPosition() {
+        return originalPosition;
+    }
 }
 

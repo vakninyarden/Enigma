@@ -13,7 +13,15 @@ public class EnigmaMachineImpl implements EnigmaMachine {
 
     private final KeyBoard keyboard;
     private Setting setting;
-    
+
+    public Setting getSetting() {
+        return setting;
+    }
+
+    public KeyBoard getKeyboard() {
+        return keyboard;
+    }
+
     public EnigmaMachineImpl(KeyBoard keyboard, Setting setting) {
         this.keyboard = keyboard;
         this.setting = setting;

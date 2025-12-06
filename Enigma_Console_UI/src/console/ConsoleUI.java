@@ -5,7 +5,11 @@ import dto.DtoMachineSpecification;
 import engine.Engine;
 import exception.FileValidationException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class ConsoleUI {
     private final Engine engine;
@@ -69,16 +73,14 @@ public class ConsoleUI {
         System.out.print("Choose option (1-8): ");
     }
 
-    private void handleLoadMachineFromXml  () {
+    private void handleLoadMachineFromXml() {
         String path = readNonEmptyLine("Please enter the XML file full path:");
-        try{
+        try {
             engine.loadXml(path);
             System.out.println("Machine loaded successfully from: " + path);
-        }
-        catch (FileValidationException e){
+        } catch (FileValidationException e) {
             System.out.println("Error loading machine: " + e.getMessage());
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.out.println("An unexpected error occurred: " + e.getMessage());
         }
     }
@@ -94,31 +96,56 @@ public class ConsoleUI {
     }
 
     private void handleManualCodeSelection() {
-        // כאן תשאלי את המשתמש על רוטורים/מיקומים/פלגבורד ותעבירי ל-engine
+
+        System.out.println("Please enter the ids of the rotor you want to use (3 rotors):");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+
+        List<Integer> rotorPositions = Arrays.stream(line.split(","))
+                .map(String::trim)          // להוריד רווחים
+                .map(Integer::parseInt)     // להפוך ל־Integer
+                .collect(Collectors.toList());
+
+        System.out.println("Please enter the initial positions of the rotors (from the ABC):");
+        String positionsLine = scanner.nextLine();
+        System.out.println("Please enter the ids of the reflector you want to use:");
+        System.out.println("1 = I, 2 = II, 3 = III, 4 = IV, 5 = V");
+        int reflectorId = scanner.nextInt();
+        engine.codeManual(rotorPositions, positionsLine, reflectorId);
+
+        /*
+        rotorPositions.add(3);
+        rotorPositions.add(2);
+        rotorPositions.add(1);
+        */
+
+
     }
 
     private void handleAutomaticCodeSetup() {
-        // כאן תקראי ל-engine שיבחר קוד אוטומטי ותציגי אותו
+        engine.codeAuto();
     }
 
     private void handleResetToOriginalCode() {
         // קריאה ל-engine לאיפוס קוד
+        engine.resetCode();
     }
 
     private void handleProcessInput() {
         // קריאת טקסט מהמשתמש, קריאה ל-engine להצפנה/פענוח, הדפסת תוצאה
         String input = readNonEmptyLine("Please enter the text to process:");
-        input = scanner.nextLine().toUpperCase();
 
+        input = input.toUpperCase();
+        String output = engine.processMessage(input);
+        System.out.println(output);
     }
 
     private void handleShowMachineHistory() {
         // קריאה ל-engine להיסטוריה והצגה
     }
 
-    private  String readNonEmptyLine(String msg)
-    {
-        while(true){
+    private String readNonEmptyLine(String msg) {
+        while (true) {
 
             if (scanner.hasNextLine()) {  // Clear any leftover newline characters
                 String leftover = scanner.nextLine();
@@ -129,7 +156,7 @@ public class ConsoleUI {
 
             System.out.println(msg);
             String line = scanner.nextLine().trim();
-            if(!line.isEmpty()){
+            if (!line.isEmpty()) {
                 return line;
             }
             System.out.println("Please enter a non-empty line");

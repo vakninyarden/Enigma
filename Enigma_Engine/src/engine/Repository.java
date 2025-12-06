@@ -13,7 +13,21 @@ public class Repository {
   Map<String, Reflector> reflectors;
   private final String abc;
 
-  public Repository(String abc) {
+    public String getAbc() {
+        return abc;
+    }
+
+
+    public Rotor getRotor(int index) {
+        return rotors.get(index);
+    }
+
+
+    public Reflector getReflecton (String id) {
+        return reflectors.get(id);
+    }
+
+    public Repository(String abc) {
         this.abc = abc;
   }
   public void loadToRepository(BTEEnigma bteEnigma) {
@@ -34,7 +48,7 @@ public class Repository {
 
     public Rotor buildRotor(BTERotor bteRotor, String abc) {
         int id = bteRotor.getId();              // מ-id של ה-XML
-        int notch = bteRotor.getNotch();        // מיקום ה-notch לפי ה-XML
+        int notch = bteRotor.getNotch()-1;        // מיקום ה-notch לפי ה-XML
 
         int size = abc.length();
         List<Character> rightMapping = new ArrayList<>(size);
@@ -95,6 +109,8 @@ public void printRepositoryContents() {
         System.out.println("Rotor ID: " + entry.getKey());
         System.out.println("Rotor Right: " + entry.getValue().getRightMapping().toString());
         System.out.println("Rotor Left: " + entry.getValue().getLeftMapping().toString());
+        System.out.println("Notch Position: " + entry.getValue().getNotchIndex());
+
     }
 
     System.out.println("\nReflectors in Repository:");
@@ -102,5 +118,6 @@ public void printRepositoryContents() {
         System.out.println("Reflector ID: " + entry.getKey());
         System.out.println("Reflector Mapping: " + entry.getValue().getMapping().toString());
     }}
+
 
 }
