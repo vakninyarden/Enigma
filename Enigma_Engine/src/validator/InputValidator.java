@@ -13,7 +13,7 @@ public class InputValidator {
         }
     }
 
-    public static void validateDuplicateRotorIds(List<Integer> rotorIds) {
+    private void validateDuplicateRotorIds(List<Integer> rotorIds) {
         java.util.Set<Integer> seen = new java.util.HashSet<>();
         for (Integer id : rotorIds) {
             if (id == null) continue;
@@ -23,11 +23,11 @@ public class InputValidator {
         }
     }
 
-    public static void validateReflectorSelecttion(int reflectorId) {
+    private void validateReflectorSelecttion(int reflectorId) {
         if (reflectorId <= 0 || reflectorId > 5 ) throw new InvalidReflectorSelectionException(""+ reflectorId);
     }
 
-    public static void validateRotorIds(String input, int maxRotors) {
+    public void validateRotorIds(String input, int maxRotors) {
 
         if (input == null || input.trim().isEmpty()) {
             throw new TooFewRotorsSelectedException("0");
@@ -60,7 +60,7 @@ public class InputValidator {
 
     }
 
-    public static void validateRotorExistence(List<Integer> rotorIds, int sizeOfRotors) {
+    private void validateRotorExistence(List<Integer> rotorIds, int sizeOfRotors) {
         for (Integer id : rotorIds) {
             if (id <= 0 || id > sizeOfRotors) {
                 throw new RotorNotFoundException(id.toString());
@@ -68,7 +68,7 @@ public class InputValidator {
         }
     }
 
-    public static void validatePositionsLength(String positionsInput, int expectedLength, String abc) {
+    private void validatePositionsLength(String positionsInput, int expectedLength, String abc) {
         if (positionsInput.length() != expectedLength) {
             throw new PositionLengthMismatchException("expected length: " + expectedLength + ", but got: " + positionsInput.length());
         }
@@ -79,6 +79,12 @@ public class InputValidator {
         }
     }
 
+    public void validateAllManualCode(List<Integer> rotorIds,int sizeOfRotors, String positionsInput, String abc, int reflectorId) {
+        validateRotorExistence(rotorIds, sizeOfRotors);
+        validateDuplicateRotorIds(rotorIds);
+        validatePositionsLength( positionsInput, rotorIds.size(), abc);
+        validateReflectorSelecttion( reflectorId);
+    }
 
 
 }

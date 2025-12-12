@@ -2,6 +2,8 @@ package engine;
 
 import dto.*;
 import bte.component.jaxb.BTEEnigma;
+import engine.statistic.ProcessRecord;
+import engine.statistic.StatisticsManager;
 import enigma.machine.component.keyboard.KeyBoard;
 import enigma.machine.component.keyboard.KeyBoardImpl;
 import enigma.machine.component.machine.EnigmaMachineImpl;
@@ -9,7 +11,7 @@ import enigma.machine.component.reflector.Reflector;
 import enigma.machine.component.rotor.Rotor;
 import enigma.machine.component.setting.Setting;
 import enigma.machine.component.setting.SettingImpl;
-import validator.FileValidator;
+import repository.Repository;
 import validator.InputValidator;
 import validator.XmlFileValidator;
 import enigma.machine.component.machine.EnigmaMachine;
@@ -19,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-
+import repository.Repository;
 
 public class EngineImpl implements Engine {
     private final int NUMBER_OF_ROTORS = 3;
@@ -31,11 +33,15 @@ public class EngineImpl implements Engine {
     private static int messageCount = 0;
     private DtoMachineSpecification dtoMachineSpecification;
 
+    public EngineImpl() {
+        statisticsManager = new StatisticsManager();
+    }
+
     @Override
     public void loadXml(String path) {
+        loadManager = new LoadManager();
         XmlFileValidator validator = new XmlFileValidator();
         validator.ValidateFilePath(path);
-        loadManager = new LoadManager();
         BTEEnigma bteMachine = loadManager.loadXmlToObject(path);
         validator.ValidateAll(bteMachine);
         repository = new Repository(bteMachine.getABC());
@@ -44,7 +50,6 @@ public class EngineImpl implements Engine {
         messageCount = 0;
     }
 
-
     @Override
     public DtoMachineSpecification showMachineDetails() {
         StringBuilder originalSbString = new StringBuilder();
@@ -52,22 +57,21 @@ public class EngineImpl implements Engine {
 
         BuildOrinigalCodeString(code, originalSbString);
 
-        StringBuilder currentSbString= new StringBuilder();
+        StringBuilder currentSbString = new StringBuilder();
 
         BuildCurrentCodeString(code, currentSbString);
 
 
         dtoMachineSpecification = new DtoMachineSpecification(repository.getRotorCount(),
-                                                              repository.getReflectorCount(),
-                                                              messageCount,
-                originalSbString.toString(),currentSbString.toString());
+                repository.getReflectorCount(),
+                messageCount,
+                originalSbString.toString(), currentSbString.toString());
 
         return dtoMachineSpecification;
     }
 
     private void BuildCurrentCodeString(Setting machineOrinialCode, StringBuilder currentSbString) {
         BuildRotorsIdString(machineOrinialCode, currentSbString);
-
         BuildCurrentCode(currentSbString, machineOrinialCode);
         BuildReflectorIdSring(currentSbString, machineOrinialCode);
     }
@@ -131,40 +135,51 @@ public class EngineImpl implements Engine {
 
     @Override
     public String processMessage(String message) {
+
         InputValidator.validateMessageInput(message, repository.getAbc());
+        long startTime=System.nanoTime();
         messageCount++;
         char[] result = new char[message.length()];
         for (int i = 0; i < message.length(); i++) {
             char ch = message.charAt(i);
             result[i] = machine.processLatter(ch);
         }
-        System.out.println(result);
+        long endTime=System.nanoTime();
+        long totalTime=endTime-startTime;
+       // System.out.println(result);
+        updateStatistic(message, result, totalTime);
+
         return new String(result);
     }
 
-
+    private void updateStatistic(String message, char[] result, long totalTime) {
+        ProcessRecord processRecord = new ProcessRecord(message, new String(result), totalTime);
+        statisticsManager.addStatistic(processRecord);
+    }
 
     @Override
     public void codeManual(String line, String initialRotorsPositions, int reflectorId) {
-        InputValidator.validateRotorIds(line, NUMBER_OF_ROTORS);
+        InputValidator inputValidator = new InputValidator();
+        inputValidator.validateRotorIds(line, NUMBER_OF_ROTORS);
         List<Integer> rotorIds = Arrays.stream(line.split(","))
-                .map(String::trim)          // להוריד רווחים
-                .map(Integer::parseInt)     // להפוך ל־Integer
+                .map(String::trim)
+                .map(Integer::parseInt)
                 .collect(Collectors.toList());
-        InputValidator.validateRotorExistence(rotorIds, repository.getRotorCount());
-        InputValidator.validateDuplicateRotorIds(rotorIds);
-        InputValidator.validatePositionsLength(initialRotorsPositions,rotorIds.size(),repository.getAbc());
-        InputValidator.validateReflectorSelecttion(reflectorId);
-
+        inputValidator.validateAllManualCode(rotorIds, repository.getRotorCount(), initialRotorsPositions, repository.getAbc(), reflectorId);
         String reflectorIdStr = intToRoman(reflectorId);
         setMachineSetting(rotorIds, initialRotorsPositions, reflectorIdStr);
 
-     /*   System.out.println(machine.getSetting().getActiveRotors().size());
-        for(int i=0; i< machine.getSetting().getActiveRotors().size(); i++){
-            System.out.println(machine.getSetting().getActiveRotors().get(i).getRotor().getRotorId());
-        }
-        System.out.println(machine.getSetting().getReflector().getReflectorId());
-*/
+        //here we set the statistics manager
+        createCodeForStatistic();
+
+
+    }
+
+    private void createCodeForStatistic() {
+
+        StringBuilder originalCode = new StringBuilder();
+        BuildOrinigalCodeString(machine.getSetting(), originalCode);
+        statisticsManager.setCurrentCode(originalCode.toString());
     }
 
     private void setMachineSetting(List<Integer> rotorIds, String initialRotorsPositions, String reflectorId) {
@@ -195,9 +210,12 @@ public class EngineImpl implements Engine {
             initialRandomRotorId(rotorIds, rand, maxId, minId);
             initialRotorsPositions = initialRandomRotorPosition(initialRotorsPositions, rand);
         }
-        int ReflectorId = rand.nextInt((numberOfReflectors))+1;
+        int ReflectorId = rand.nextInt((numberOfReflectors)) + 1;
         String id = intToRoman(ReflectorId);
         setMachineSetting(rotorIds, initialRotorsPositions, id);
+
+        createCodeForStatistic();
+
     }
 
     private String initialRandomRotorPosition(String initialRotorsPositions, Random rand) {
@@ -224,9 +242,8 @@ public class EngineImpl implements Engine {
 
     @Override
     public void statistics() {
-
+        statisticsManager.printStatistics();
     }
-
 
     private String intToRoman(int num) {
         String[] thousands = {"", "M", "MM", "MMM"};

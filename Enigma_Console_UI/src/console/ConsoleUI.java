@@ -15,6 +15,8 @@ public class ConsoleUI {
     private final Engine engine;
     private final Scanner scanner = new Scanner(System.in);
     private final int NUMBER_OF_ROTORS = 3;
+    private boolean isMachineLoaded = false;
+    private boolean isCodeSet = false;
 
     public ConsoleUI(Engine engine) {
         this.engine = engine;
@@ -27,20 +29,34 @@ public class ConsoleUI {
             printMainMenu();
             try {
                 choice = scanner.nextInt();
+                if ((choice > 1 && choice <=7) && !isMachineLoaded) {
+                    throw  new InputValidationException("Machine not loaded. Please load a machine from XML first.");
+                }
+                if ((choice == 2 || choice==5 || choice == 6) && !isCodeSet) {
+                    throw new InputValidationException("Code not set. Please set the code first.");
+                }
             } catch (InputMismatchException e) {
                 scanner.nextLine();
                 System.out.println("Invalid choice, please enter a number between 1-8.");
                 continue;
             }
+            catch (InputValidationException e) {
+                System.out.println(e.getMessage());
+                continue;
+            }
+
 
             switch (choice) {
                 case 1:
+
                     handleLoadMachineFromXml();
                     break;
                 case 2:
                     handleShowCurrentMachineStatus();
+
                     break;
                 case 3:
+
                     handleManualCodeSelection();
                     break;
                 case 4:
@@ -84,6 +100,8 @@ public class ConsoleUI {
         try {
             engine.loadXml(path);
             System.out.println("Machine loaded successfully from: " + path);
+            isMachineLoaded = true;
+            isCodeSet = false;
         } catch (FileValidationException e) {
             System.out.println("Error loading machine: " + e.getMessage());
         } catch (Exception e) {
@@ -92,6 +110,7 @@ public class ConsoleUI {
     }
 
     private void handleShowCurrentMachineStatus() {
+       // checkMachineLoaded();
         // כאן תקראי ל-engine ו"תדפיסי" את הסטטוס
         DtoMachineSpecification spec = engine.showMachineDetails();
         System.out.println("Current machine status: ");
@@ -135,10 +154,13 @@ public class ConsoleUI {
             System.out.println("An error occurred while setting the manual code: " + e.getMessage());
             return;
         }
+        isCodeSet = true;
     }
 
     private void handleAutomaticCodeSetup() {
+
         engine.codeAuto();
+        isCodeSet = true;
     }
 
     private void handleResetToOriginalCode() {
@@ -161,7 +183,7 @@ public class ConsoleUI {
     }
 
     private void handleShowMachineHistory() {
-        // קריאה ל-engine להיסטוריה והצגה
+        engine.statistics();
     }
 
     private String readNonEmptyLine(String msg) {
@@ -182,6 +204,12 @@ public class ConsoleUI {
             System.out.println("Please enter a non-empty line");
             System.out.println(msg);
 
+        }
+    }
+
+    private void checkMachineLoaded() {
+        if (!isMachineLoaded) {
+            throw new IllegalStateException("Machine not loaded. Please load a machine from XML first.");
         }
     }
 }
