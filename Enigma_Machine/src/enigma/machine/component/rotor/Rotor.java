@@ -11,7 +11,6 @@ public interface Rotor {
     void reset();
     public void setOriginalPosition(int originalPosition) ;
     public List<Character> getRightMapping() ;
-    public List<Character> getLeftMapping() ;
     public int getCurrentPosition() ;
     public int getOriginalPosition() ;
     }

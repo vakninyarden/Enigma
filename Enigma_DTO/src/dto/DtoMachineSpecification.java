@@ -16,19 +16,22 @@ public class DtoMachineSpecification {
     }
 
 
-
     public int getNumOfRotors() {
         return numOfRotors;
     }
+
     public int getNumOfReflectors() {
         return numOfReflectors;
     }
+
     public int getNumOfMessages() {
         return numOfMessages;
     }
+
     public String getCurrentCode() {
         return currentCode;
     }
+
     public String getOriginalCode() {
         return originalCode;
     }

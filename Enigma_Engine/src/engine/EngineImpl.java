@@ -16,22 +16,21 @@ import validator.InputValidator;
 import validator.XmlFileValidator;
 import enigma.machine.component.machine.EnigmaMachine;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.io.*;
+import java.net.ProxySelector;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
+
 import repository.Repository;
 
 public class EngineImpl implements Engine {
     private final int NUMBER_OF_ROTORS = 3;
-
     private EnigmaMachine machine;
-    private LoadManager loadManager;
     private StatisticsManager statisticsManager;
     private Repository repository;
     private static int messageCount = 0;
-    private DtoMachineSpecification dtoMachineSpecification;
 
     public EngineImpl() {
         statisticsManager = new StatisticsManager();
@@ -39,19 +38,18 @@ public class EngineImpl implements Engine {
 
     @Override
     public void loadXml(String path) {
-        loadManager = new LoadManager();
         XmlFileValidator validator = new XmlFileValidator();
         validator.ValidateFilePath(path);
-        BTEEnigma bteMachine = loadManager.loadXmlToObject(path);
+        BTEEnigma bteMachine = LoadManager.loadXmlToObject(path);
         validator.ValidateAll(bteMachine);
-        repository = new Repository(bteMachine.getABC());
-        repository.loadToRepository(bteMachine);
-        repository.printRepositoryContents();
+        repository = new Repository(bteMachine.getABC(), bteMachine);
         messageCount = 0;
+        statisticsManager.resetStatistics();
     }
 
     @Override
     public DtoMachineSpecification showMachineDetails() {
+
         StringBuilder originalSbString = new StringBuilder();
         Setting code = machine.getSetting();
 
@@ -62,7 +60,7 @@ public class EngineImpl implements Engine {
         BuildCurrentCodeString(code, currentSbString);
 
 
-        dtoMachineSpecification = new DtoMachineSpecification(repository.getRotorCount(),
+        DtoMachineSpecification dtoMachineSpecification = new DtoMachineSpecification(repository.getRotorCount(),
                 repository.getReflectorCount(),
                 messageCount,
                 originalSbString.toString(), currentSbString.toString());
@@ -77,15 +75,18 @@ public class EngineImpl implements Engine {
     }
 
     private void BuildCurrentCode(StringBuilder currentSbString, Setting machineOrinialCode) {
+
         currentSbString.append('<');
-        for (int i = 0; i < machineOrinialCode.getActiveRotors().size(); i++) {
-            int currentPosition = machineOrinialCode.getActiveRotors().get(i).getRotor().getCurrentPosition();
-            currentSbString.append(repository.getRotor(machineOrinialCode.getActiveRotors().get(i).getRotor().getRotorId()).getRightMapping().get(currentPosition));
+        List<Setting.RotorPosition> activeRotors = machineOrinialCode.getActiveRotors();
+        for (int i = 0; i < activeRotors.size(); i++) {
+            int currentPosition = activeRotors.get(i).getRotor().getCurrentPosition();
+            currentSbString.append(repository.getRotor(activeRotors.get(i).getRotor().getRotorId()).getRightMapping().get(currentPosition));
             currentSbString.append('(');
-            int DistanceFromNotch = (machineOrinialCode.getActiveRotors().get(i).getRotor().getNotchIndex() - currentPosition + repository.getAbc().length()) % repository.getAbc().length();
+            int abcLength = repository.getAbc().length();
+            int DistanceFromNotch = (activeRotors.get(i).getRotor().getNotchIndex() - currentPosition + abcLength) % abcLength;
             currentSbString.append(DistanceFromNotch);
             currentSbString.append(')');
-            if (i != machineOrinialCode.getActiveRotors().size() - 1) {
+            if (i != activeRotors.size() - 1) {
                 currentSbString.append(',');
             }
         }
@@ -137,16 +138,15 @@ public class EngineImpl implements Engine {
     public String processMessage(String message) {
 
         InputValidator.validateMessageInput(message, repository.getAbc());
-        long startTime=System.nanoTime();
+        long startTime = System.nanoTime();
         messageCount++;
         char[] result = new char[message.length()];
         for (int i = 0; i < message.length(); i++) {
             char ch = message.charAt(i);
             result[i] = machine.processLatter(ch);
         }
-        long endTime=System.nanoTime();
-        long totalTime=endTime-startTime;
-       // System.out.println(result);
+        long endTime = System.nanoTime();
+        long totalTime = endTime - startTime;
         updateStatistic(message, result, totalTime);
 
         return new String(result);
@@ -160,7 +160,7 @@ public class EngineImpl implements Engine {
     @Override
     public void codeManual(String line, String initialRotorsPositions, int reflectorId) {
         InputValidator inputValidator = new InputValidator();
-        inputValidator.validateRotorIds(line, NUMBER_OF_ROTORS);
+        inputValidator.validateRotorIds(line);
         List<Integer> rotorIds = Arrays.stream(line.split(","))
                 .map(String::trim)
                 .map(Integer::parseInt)
@@ -169,7 +169,6 @@ public class EngineImpl implements Engine {
         String reflectorIdStr = intToRoman(reflectorId);
         setMachineSetting(rotorIds, initialRotorsPositions, reflectorIdStr);
 
-        //here we set the statistics manager
         createCodeForStatistic();
 
 
@@ -187,7 +186,6 @@ public class EngineImpl implements Engine {
         int size = rotorIds.size();
         for (int i = size - 1; i >= 0; i--) {
             Rotor rotor = repository.getRotor(rotorIds.get(i));
-//            int position = repository.getAbc().indexOf(initialRotorsPositions.charAt(i));
             int position = rotor.getRightMapping().indexOf(initialRotorsPositions.charAt(i));
             Setting.RotorPosition rotorPosition = new Setting.RotorPosition(rotor, position);
             activeRotors.add(rotorPosition);
@@ -199,7 +197,7 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void codeAuto() {
+    public String codeAuto() {
         Random rand = new Random();
         String initialRotorsPositions = "";
         int numberOfReflectors = repository.getReflectorCount();
@@ -214,8 +212,10 @@ public class EngineImpl implements Engine {
         String id = intToRoman(ReflectorId);
         setMachineSetting(rotorIds, initialRotorsPositions, id);
 
+        StringBuilder originalCode = new StringBuilder();
+        BuildOrinigalCodeString(machine.getSetting(), originalCode);
         createCodeForStatistic();
-
+        return originalCode.toString();
     }
 
     private String initialRandomRotorPosition(String initialRotorsPositions, Random rand) {
@@ -241,8 +241,9 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public void statistics() {
-        statisticsManager.printStatistics();
+    public DtoStatistic statistics() {
+        DtoStatistic dtoStatistic = new DtoStatistic(statisticsManager.getStatisticsData());
+        return dtoStatistic;
     }
 
     private String intToRoman(int num) {
@@ -257,7 +258,24 @@ public class EngineImpl implements Engine {
                 units[num % 10];
     }
 
-    public static int getMessageCount() {
-        return messageCount;
+    @Override
+    public void saveMachineStateToFile(String path) throws IOException {
+        try (
+                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(path))) {
+            out.writeObject(machine);
+            out.writeObject(statisticsManager);
+            out.writeObject(repository);
+        }
+    }
+
+    @Override
+    public void loadMachineStateFromFile(String path) throws IOException {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(path))) {
+            this.machine = (EnigmaMachine) in.readObject();
+            this.statisticsManager = (StatisticsManager) in.readObject();
+            this.repository = (Repository) in.readObject();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

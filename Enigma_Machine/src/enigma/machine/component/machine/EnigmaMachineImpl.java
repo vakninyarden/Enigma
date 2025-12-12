@@ -1,25 +1,21 @@
 package enigma.machine.component.machine;
 
 import enigma.machine.component.keyboard.KeyBoard;
-import enigma.machine.component.reflector.ReflectorImpl;
 import enigma.machine.component.rotor.Direction;
 import enigma.machine.component.setting.Setting;
 import enigma.machine.component.rotor.Rotor;
 
+import java.io.Serializable;
 import java.util.List;
 
 
-public class EnigmaMachineImpl implements EnigmaMachine {
+public class EnigmaMachineImpl implements EnigmaMachine, Serializable {
 
     private final KeyBoard keyboard;
     private Setting setting;
 
     public Setting getSetting() {
         return setting;
-    }
-
-    public KeyBoard getKeyboard() {
-        return keyboard;
     }
 
     public EnigmaMachineImpl(KeyBoard keyboard, Setting setting) {
@@ -29,14 +25,9 @@ public class EnigmaMachineImpl implements EnigmaMachine {
 
     @Override
     public void resetMachine() {
-        for (Setting.RotorPosition rotors : setting.getActiveRotors() ){
+        for (Setting.RotorPosition rotors : setting.getActiveRotors()) {
             rotors.rotor.reset();
         }
-    }
-
-    @Override
-    public void machineSettings(Setting settings) {
-        this.setting = settings;
     }
 
     @Override
@@ -46,8 +37,8 @@ public class EnigmaMachineImpl implements EnigmaMachine {
 
         rotorsStep(rotors);
         intermediate = moveForward(rotors, intermediate);
-        intermediate = setting.getReflector().reflect(intermediate +1) -1;
-        intermediate = moveBackward(rotors, intermediate );
+        intermediate = setting.getReflector().reflect(intermediate + 1) - 1;
+        intermediate = moveBackward(rotors, intermediate);
         return keyboard.lightALamp(intermediate);
     }
 
@@ -75,6 +66,4 @@ public class EnigmaMachineImpl implements EnigmaMachine {
             rotorIndex++;
         } while (shouldStepNext && rotorIndex < rotors.size());
     }
-
-
 }

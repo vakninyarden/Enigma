@@ -1,6 +1,7 @@
 package engine.statistic;
+import java.io.Serializable;
 
-public class ProcessRecord {
+public class ProcessRecord implements Serializable {
     public final  String sorceMessage;
     public final String processedMessage;
     private final long timeInNanos;

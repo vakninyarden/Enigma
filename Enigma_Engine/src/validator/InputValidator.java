@@ -8,7 +8,7 @@ public class InputValidator {
     public static void validateMessageInput(String massege, String abc) {
         for (char c : massege.toCharArray()) {
             if (!abc.contains(String.valueOf(c))) {
-            throw new InvalidEnigmaCharacterException(c);
+                throw new InvalidEnigmaCharacterException(c);
             }
         }
     }
@@ -24,28 +24,24 @@ public class InputValidator {
     }
 
     private void validateReflectorSelecttion(int reflectorId) {
-        if (reflectorId <= 0 || reflectorId > 5 ) throw new InvalidReflectorSelectionException(""+ reflectorId);
+        if (reflectorId <= 0 || reflectorId > 5) throw new InvalidReflectorSelectionException("" + reflectorId);
     }
 
-    public void validateRotorIds(String input, int maxRotors) {
+    public void validateRotorIds(String input) {
 
         if (input == null || input.trim().isEmpty()) {
             throw new TooFewRotorsSelectedException("0");
         }
 
-        // פצל לפי פסיק
         String[] parts = input.split(",");
 
-        // בדוק שכל חלק הוא מספר תקין
         for (String part : parts) {
             String trimmed = part.trim();
 
-            // בדוק שהחלק לא ריק
             if (trimmed.isEmpty()) {
                 throw new NonNumericRotorIdException(part);
             }
 
-            // בדוק שהוא מספר
             try {
                 Integer.parseInt(trimmed);
             } catch (NumberFormatException e) {
@@ -79,11 +75,11 @@ public class InputValidator {
         }
     }
 
-    public void validateAllManualCode(List<Integer> rotorIds,int sizeOfRotors, String positionsInput, String abc, int reflectorId) {
+    public void validateAllManualCode(List<Integer> rotorIds, int sizeOfRotors, String positionsInput, String abc, int reflectorId) {
         validateRotorExistence(rotorIds, sizeOfRotors);
         validateDuplicateRotorIds(rotorIds);
-        validatePositionsLength( positionsInput, rotorIds.size(), abc);
-        validateReflectorSelecttion( reflectorId);
+        validatePositionsLength(positionsInput, rotorIds.size(), abc);
+        validateReflectorSelecttion(reflectorId);
     }
 
 

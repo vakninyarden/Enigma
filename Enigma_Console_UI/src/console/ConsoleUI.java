@@ -2,19 +2,19 @@ package console;
 
 
 import dto.DtoMachineSpecification;
+import dto.DtoStatistic;
 import engine.Engine;
+import engine.statistic.ProcessRecord;
 import exception.fileexceoption.FileValidationException;
 import exception.inputexception.InputValidationException;
 import exception.inputexception.InvalidEnigmaCharacterException;
-import validator.InputValidator;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ConsoleUI {
     private final Engine engine;
     private final Scanner scanner = new Scanner(System.in);
-    private final int NUMBER_OF_ROTORS = 3;
     private boolean isMachineLoaded = false;
     private boolean isCodeSet = false;
 
@@ -29,18 +29,17 @@ public class ConsoleUI {
             printMainMenu();
             try {
                 choice = scanner.nextInt();
-                if ((choice > 1 && choice <=7) && !isMachineLoaded) {
-                    throw  new InputValidationException("Machine not loaded. Please load a machine from XML first.");
+                if ((choice > 1 && choice <= 8) && !isMachineLoaded) {
+                    throw new InputValidationException("Machine not loaded. Please load a machine from XML first.");
                 }
-                if ((choice == 2 || choice==5 || choice == 6) && !isCodeSet) {
+                if ((choice == 2 || choice == 5 || choice == 6 || choice == 8) && !isCodeSet) {
                     throw new InputValidationException("Code not set. Please set the code first.");
                 }
             } catch (InputMismatchException e) {
                 scanner.nextLine();
-                System.out.println("Invalid choice, please enter a number between 1-8.");
+                System.out.println("Invalid choice, please enter a number between 1-10.");
                 continue;
-            }
-            catch (InputValidationException e) {
+            } catch (InputValidationException e) {
                 System.out.println(e.getMessage());
                 continue;
             }
@@ -72,11 +71,17 @@ public class ConsoleUI {
                     handleShowMachineHistory();
                     break;
                 case 8:
+                    handleSaveMachineStateToFile();
+                    break;
+                case 9:
+                    handleLoadMachineStateFromFile();
+                    break;
+                case 10:
                     exit = true;
                     System.out.println("Exiting, goodbye.");
                     break;
                 default:
-                    System.out.println("Invalid choice, please enter a number between 1-8.");
+                    System.out.println("Invalid choice, please enter a number between 1-10.");
             }
         }
 
@@ -91,8 +96,10 @@ public class ConsoleUI {
         System.out.println("5. Process input");
         System.out.println("6. Reset to original code");
         System.out.println("7. Get machine history");
-        System.out.println("8. Exit");
-        System.out.print("Choose option (1-8): ");
+        System.out.println("8. Save machine state to file");
+        System.out.println("9. Load machine state from file");
+        System.out.println("10. Exit");
+        System.out.print("Choose option (1-10): ");
     }
 
     private void handleLoadMachineFromXml() {
@@ -110,8 +117,6 @@ public class ConsoleUI {
     }
 
     private void handleShowCurrentMachineStatus() {
-       // checkMachineLoaded();
-        // כאן תקראי ל-engine ו"תדפיסי" את הסטטוס
         DtoMachineSpecification spec = engine.showMachineDetails();
         System.out.println("Current machine status: ");
         System.out.println("Amount of rotors: ");
@@ -131,24 +136,20 @@ public class ConsoleUI {
         Scanner scanner = new Scanner(System.in);
         String line = scanner.nextLine();
 
-//        List<Integer> rotorPositions = Arrays.stream(line.split(","))
-//                .map(String::trim)          // להוריד רווחים
-//                .map(Integer::parseInt)     // להפוך ל־Integer
-//                .collect(Collectors.toList());
-
         System.out.println("Please enter the initial positions of the rotors (from the ABC):");
         String positionsLine = scanner.nextLine();
         System.out.println("Please enter the ids of the reflector you want to use:");
         System.out.println("1 = I, 2 = II, 3 = III, 4 = IV, 5 = V");
+
         int reflectorId;
         try {
-             reflectorId = scanner.nextInt();
+            reflectorId = scanner.nextInt();
         } catch (InputMismatchException e) {
             scanner.nextLine();
             System.out.println("Invalid choice, the reflector id must be a number between 1-5.");
             return;
         }
-        try{
+        try {
             engine.codeManual(line, positionsLine, reflectorId);
         } catch (InputValidationException e) {
             System.out.println("An error occurred while setting the manual code: " + e.getMessage());
@@ -158,18 +159,16 @@ public class ConsoleUI {
     }
 
     private void handleAutomaticCodeSetup() {
-
-        engine.codeAuto();
+        String code = engine.codeAuto();
+        System.out.println("Automatic code setup successfully: " + code);
         isCodeSet = true;
     }
 
     private void handleResetToOriginalCode() {
-        // קריאה ל-engine לאיפוס קוד
         engine.resetCode();
     }
 
     private void handleProcessInput() {
-        // קריאת טקסט מהמשתמש, קריאה ל-engine להצפנה/פענוח, הדפסת תוצאה
         String input = readNonEmptyLine("Please enter the text to process:");
 
         input = input.toUpperCase();
@@ -183,7 +182,28 @@ public class ConsoleUI {
     }
 
     private void handleShowMachineHistory() {
-        engine.statistics();
+        DtoStatistic statisticsData = engine.statistics();
+        printStatistics(statisticsData.getStatisticsData());
+    }
+
+    public void printStatistics(Map<String, List<ProcessRecord>> statisticsData) {
+        if (statisticsData.isEmpty()) {
+            System.out.println("No statistics available.");
+            return;
+        }
+        for (Map.Entry<String, List<ProcessRecord>> entry : statisticsData.entrySet()) {
+            String code = entry.getKey();
+            List<ProcessRecord> messages = entry.getValue();
+            System.out.println("Code: " + code);
+
+            int counter = 1;
+            for (ProcessRecord message : messages) {
+                System.out.print(counter + ". <" + message.getSorceMessage() + "> --> <" +
+                        message.getProcessedMessage()
+                        + " (" + message.getTimeInNanos() + " nano-seconds)\n");
+                counter++;
+            }
+        }
     }
 
     private String readNonEmptyLine(String msg) {
@@ -207,9 +227,29 @@ public class ConsoleUI {
         }
     }
 
-    private void checkMachineLoaded() {
-        if (!isMachineLoaded) {
-            throw new IllegalStateException("Machine not loaded. Please load a machine from XML first.");
+    private void handleSaveMachineStateToFile() {
+        String fullPath = readNonEmptyLine("Please enter the full path of the file you want to save the machine to (without postfix):");
+        fullPath += ".bin";
+        try {
+            engine.saveMachineStateToFile(fullPath);
+            System.out.println("Machine state saved successfully to: " + fullPath);
+        } catch (IOException e) {
+            System.out.println("An error occurred while saving the machine state: " + e.getMessage());
         }
+    }
+
+    private void handleLoadMachineStateFromFile() {
+        String fullPath = readNonEmptyLine("Please enter the full path of the file you want to load the machine from: (without postfix)");
+        fullPath += ".bin";
+        try {
+            engine.loadMachineStateFromFile(fullPath);
+            System.out.println("Machine state loaded successfully from: " + fullPath);
+            isMachineLoaded = true;
+            isCodeSet = true;
+        } catch (IOException e) {
+            System.out.println("An error occurred while loading the machine state: " + e.getMessage());
+        }
+
+
     }
 }

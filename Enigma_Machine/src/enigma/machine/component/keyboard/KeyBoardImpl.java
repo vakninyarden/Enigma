@@ -1,6 +1,7 @@
 package enigma.machine.component.keyboard;
+import java.io.Serializable;
 
-public class KeyBoardImpl implements KeyBoard {
+public class KeyBoardImpl implements KeyBoard , Serializable {
     private String alphabet;
 
     public KeyBoardImpl(String alphabet) {
@@ -16,7 +17,5 @@ public class KeyBoardImpl implements KeyBoard {
         return alphabet.charAt(input);
     }
 
-    @Override
-    public  int getAlphabetSize() {
-        return alphabet.length();   }
+
 }

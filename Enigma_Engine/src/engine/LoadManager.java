@@ -12,14 +12,13 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 
-public class LoadManager {
+class LoadManager {
 
-    public BTEEnigma loadXmlToObject(String xmlNameFile) {
+    public static BTEEnigma loadXmlToObject(String xmlNameFile) {
         try {
             InputStream inputStream = new FileInputStream(new File(xmlNameFile));
             BTEEnigma machine = deserializeFrom(inputStream);
             cleanMachine(machine);
-            //System.out.println("Successfully loaded XML to object: " + machine);
             return machine;
         } catch (JAXBException | FileNotFoundException e) {
             e.printStackTrace();
@@ -32,20 +31,19 @@ public class LoadManager {
         Unmarshaller u = jc.createUnmarshaller();
         return (BTEEnigma) u.unmarshal(in);
     }
-    private void cleanMachine(BTEEnigma machine) {
-        if(machine == null) {return;}
 
-        String  abc = machine.getABC();
-        if(abc!=null){
+    private static void cleanMachine(BTEEnigma machine) {
+        if (machine == null) {
+            return;
+        }
+
+        String abc = machine.getABC();
+        if (abc != null) {
             machine.setABC(abc.trim());
 
         }
 
     }
-
-
-
-
 
 
 };

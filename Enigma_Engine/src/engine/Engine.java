@@ -1,15 +1,26 @@
 package engine;
 
 import dto.DtoMachineSpecification;
+import dto.DtoStatistic;
 
-import java.util.List;
+import java.io.IOException;
 
 public interface Engine {
     void loadXml(String path);
+
     DtoMachineSpecification showMachineDetails();
+
     String processMessage(String message);
+
     public void codeManual(String line, String initialRotorsPositions, int reflectorId);
-    void codeAuto();
+
+    String codeAuto();
+
     void resetCode();
-    void statistics();
+
+    DtoStatistic statistics();
+
+    void saveMachineStateToFile(String path) throws IOException;
+
+    void loadMachineStateFromFile(String path) throws IOException;
 }
