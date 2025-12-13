@@ -48,8 +48,15 @@ public class EngineImpl implements Engine {
     }
 
     @Override
-    public DtoMachineSpecification showMachineDetails() {
+    public DtoMachineSpecification showMachineDetails(boolean isCodeSet) {
 
+        if(!isCodeSet) {
+            DtoMachineSpecification dtoMachineSpecification = new DtoMachineSpecification(repository.getRotorCount(),
+                    repository.getReflectorCount(),
+                    messageCount,
+                    "", "");
+            return dtoMachineSpecification;
+        }
         StringBuilder originalSbString = new StringBuilder();
         Setting code = machine.getSetting();
 

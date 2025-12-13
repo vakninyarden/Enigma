@@ -32,7 +32,7 @@ public class ConsoleUI {
                 if ((choice > 1 && choice <= 8) && !isMachineLoaded) {
                     throw new InputValidationException("Machine not loaded. Please load a machine from XML first.");
                 }
-                if ((choice == 2 || choice == 5 || choice == 6 || choice == 8) && !isCodeSet) {
+                if (( choice == 5 || choice == 6 || choice == 8) && !isCodeSet) {
                     throw new InputValidationException("Code not set. Please set the code first.");
                 }
             } catch (InputMismatchException e) {
@@ -100,6 +100,7 @@ public class ConsoleUI {
         System.out.println("9. Load machine state from file");
         System.out.println("10. Exit");
         System.out.print("Choose option (1-10): ");
+        System.out.println();
     }
 
     private void handleLoadMachineFromXml() {
@@ -117,7 +118,7 @@ public class ConsoleUI {
     }
 
     private void handleShowCurrentMachineStatus() {
-        DtoMachineSpecification spec = engine.showMachineDetails();
+        DtoMachineSpecification spec = engine.showMachineDetails(isCodeSet);
         System.out.println("Current machine status: ");
         System.out.println("Amount of rotors: ");
         System.out.println(spec.getNumOfRotors());
@@ -125,10 +126,13 @@ public class ConsoleUI {
         System.out.println(spec.getNumOfReflectors());
         System.out.println("Number of processed messages: ");
         System.out.println(spec.getNumOfMessages());
-        System.out.println("Original Setting Code:");
-        System.out.println(spec.getOriginalCode());
-        System.out.println("Current Setting Code");
-        System.out.println(spec.getCurrentCode());
+        if (isCodeSet) {
+            System.out.println("Original Setting Code:");
+            System.out.println(spec.getOriginalCode());
+            System.out.println("Current Setting Code");
+            System.out.println(spec.getCurrentCode());
+        }
+
     }
 
     private void handleManualCodeSelection() {

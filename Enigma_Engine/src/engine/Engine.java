@@ -8,7 +8,7 @@ import java.io.IOException;
 public interface Engine {
     void loadXml(String path);
 
-    DtoMachineSpecification showMachineDetails();
+    DtoMachineSpecification showMachineDetails(boolean isCodeSet);
 
     String processMessage(String message);
 
