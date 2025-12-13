@@ -1,14 +1,13 @@
 package validator;
 
 import bte.component.jaxb.*;
-import exception.*;
+import exception.fileexceoption.*;
 
 import java.io.File;
 import java.util.*;
 
 public class XmlFileValidator implements FileValidator {
 
-    // 1. קובץ קיים
     public boolean isFileExists(String filePath) {
         File file = new File(filePath);
         if (!file.exists() || !file.isFile()) {
@@ -17,7 +16,6 @@ public class XmlFileValidator implements FileValidator {
         return true;
     }
 
-    // 2. קובץ XML
     public boolean validateIsXmlFile(String filePath) {
         if (!filePath.toLowerCase().endsWith(".xml")) {
             throw new NotXmlFileException(filePath);
@@ -26,7 +24,6 @@ public class XmlFileValidator implements FileValidator {
 
     }
 
-    // 3. גודל ABC זוגי
     @Override
     public boolean isAbcSizeEven(String abc) {
         if (abc.length() % 2 != 0) {
@@ -35,7 +32,6 @@ public class XmlFileValidator implements FileValidator {
         return true;
     }
 
-    // 4. לפחות 3 רוטורים
     @Override
     public boolean hasAtLeastThreeRotors(List<BTERotor> rotors) {
         if (rotors.size() < 3) {
@@ -44,24 +40,19 @@ public class XmlFileValidator implements FileValidator {
         return true;
     }
 
-    // 5. IDs רציפים וייחודיים
     @Override
     public boolean hasValidRotorIds(List<BTERotor> rotors) {
 
         if (rotors == null || rotors.isEmpty()) {
             throw new InvalidRotorIdsException();
         }
-
         Set<Integer> ids = new HashSet<>();
         int maxId = 0;
-
         for (BTERotor rotor : rotors) {
             int id = rotor.getId();
-
             if (id <= 0) {
                 throw new InvalidRotorIdsException();
             }
-
             if (!ids.add(id)) {
                 throw new InvalidRotorIdsException();
             }
@@ -72,11 +63,9 @@ public class XmlFileValidator implements FileValidator {
         if (maxId != ids.size()) {
             throw new InvalidRotorIdsException();
         }
-
         return true;
     }
 
-    // 6. אין מיפויים כפולים ברוטור
     @Override
     public boolean hasNoDuplicateMappingsInRotor(List<BTERotor> rotors) {
 
@@ -105,13 +94,12 @@ public class XmlFileValidator implements FileValidator {
         return true;
     }
 
-    // 7. זיז הפסיעה בטווח
     @Override
     public boolean isNotchPositionInRange(List<BTERotor> rotors, String abc) {
 
         for (BTERotor rotor : rotors) {
             int notchPosition = rotor.getNotch();
-            if (notchPosition < 0 || notchPosition >= abc.length()) {
+            if (notchPosition < 0 || notchPosition > abc.length()) {
                 throw new NotchOutOfRangeException(rotor.getId());
             }
         }
@@ -119,7 +107,6 @@ public class XmlFileValidator implements FileValidator {
         return true;
     }
 
-    // 8. מזהי רפלקטורים תקינים (I..V)
     @Override
     public boolean hasValidReflectorIds(List<BTEReflector> reflectors) {
 
@@ -151,7 +138,6 @@ public class XmlFileValidator implements FileValidator {
         return true;
     }
 
-    // 9. אין מיפוי של אות לעצמה ברפלקטור
     @Override
     public boolean hasNoSelfMappingInReflector(List<BTEReflector> reflectors) {
 
@@ -169,23 +155,28 @@ public class XmlFileValidator implements FileValidator {
         return true;
     }
 
-    // כלי עזר
     public int romanToInt(String roman) {
         if (roman == null) {
             return -1;
         }
 
         switch (roman) {
-            case "I":   return 1;
-            case "II":  return 2;
-            case "III": return 3;
-            case "IV":  return 4;
-            case "V":   return 5;
-            default:    return -1;
+            case "I":
+                return 1;
+            case "II":
+                return 2;
+            case "III":
+                return 3;
+            case "IV":
+                return 4;
+            case "V":
+                return 5;
+            default:
+                return -1;
         }
     }
 
-    public void ValidateAll( BTEEnigma bteEnigma) {
+    public void ValidateAll(BTEEnigma bteEnigma) {
         isAbcSizeEven(bteEnigma.getABC());
         hasAtLeastThreeRotors(bteEnigma.getBTERotors().getBTERotor());
         hasValidRotorIds(bteEnigma.getBTERotors().getBTERotor());
@@ -194,6 +185,7 @@ public class XmlFileValidator implements FileValidator {
         hasValidReflectorIds(bteEnigma.getBTEReflectors().getBTEReflector());
         hasNoSelfMappingInReflector(bteEnigma.getBTEReflectors().getBTEReflector());
     }
+
     public void ValidateFilePath(String filePath) {
         validateIsXmlFile(filePath);
         isFileExists(filePath);

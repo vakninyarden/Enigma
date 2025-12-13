@@ -1,4 +1,4 @@
-package exception;
+package exception.fileexceoption;
 
 public class ReflectorSelfMappingException extends FileValidationException {
     public ReflectorSelfMappingException(String letter, String reflectorId) {

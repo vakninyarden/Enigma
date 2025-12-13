@@ -1,18 +1,15 @@
 package enigma.machine.component.rotor;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.io.Serializable;
 
-
-public class RotorImpl implements Rotor {
-private final int id;
-private final int notchPosition;
-private int currentPosition;
-private  int originalPosition;
-private final List<Character> rightMapping;
-private final List<Character> leftMapping;
-
-
+public class RotorImpl implements Rotor, Serializable {
+    private final int id;
+    private final int notchPosition;
+    private int currentPosition;
+    private int originalPosition;
+    private final List<Character> rightMapping;
+    private final List<Character> leftMapping;
 
     public RotorImpl(int id, int notchPosition,
                      List<Character> rightMapping, List<Character> leftMapping) {
@@ -23,8 +20,10 @@ private final List<Character> leftMapping;
         this.notchPosition = notchPosition;
         this.currentPosition = 0;
     }
+
+    @Override
     public void setOriginalPosition(int originalPosition) {
-        this.originalPosition= originalPosition;
+        this.originalPosition = originalPosition;
         this.currentPosition = originalPosition;
     }
 
@@ -33,11 +32,11 @@ private final List<Character> leftMapping;
     public int getRotorId() {
         return id;
     }
-    /*
+
     @Override
     public int getNotchIndex() {
         return notchPosition;
-    }*/
+    }
 
     @Override
     public int mapping(int indexInRotor, Direction direction) {
@@ -48,8 +47,7 @@ private final List<Character> leftMapping;
         if (direction == Direction.FORWARD) {
             outChar = rightMapping.get(shifted);
             mapped = leftMapping.indexOf(outChar);
-        }
-        else {
+        } else {
             outChar = leftMapping.get(shifted);
             mapped = rightMapping.indexOf(outChar);
         }
@@ -77,9 +75,12 @@ private final List<Character> leftMapping;
         return rightMapping;
     }
 
-    public List<Character> getLeftMapping() {
-        return leftMapping;
+    public int getCurrentPosition() {
+        return currentPosition;
     }
 
+    public int getOriginalPosition() {
+        return originalPosition;
+    }
 }
 

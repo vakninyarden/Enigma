@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DTO/DTO.iml" filepath="$PROJECT_DIR$/DTO/DTO.iml" />
       <module fileurl="file://$PROJECT_DIR$/Enigma.iml" filepath="$PROJECT_DIR$/Enigma.iml" />
       <module fileurl="file://$PROJECT_DIR$/Enigma_Console_UI/Enigma_Console_UI.iml" filepath="$PROJECT_DIR$/Enigma_Console_UI/Enigma_Console_UI.iml" />
       <module fileurl="file://$PROJECT_DIR$/Enigma_DTO/Enigma_DTO.iml" filepath="$PROJECT_DIR$/Enigma_DTO/Enigma_DTO.iml" />

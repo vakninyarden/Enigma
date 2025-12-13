@@ -4,12 +4,13 @@ import java.util.List;
 
 public interface Rotor {
     int getRotorId();
-    // int getNotchIndex();
+    public int getNotchIndex();
     int mapping(int indexInRotor, Direction direction);
     boolean atNotch();
     void step();
     void reset();
-
+    public void setOriginalPosition(int originalPosition) ;
     public List<Character> getRightMapping() ;
-    public List<Character> getLeftMapping() ;
+    public int getCurrentPosition() ;
+    public int getOriginalPosition() ;
     }

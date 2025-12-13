@@ -1,4 +1,4 @@
-package exception;
+package exception.fileexceoption;
 
 public class NotXmlFileException extends FileValidationException {
     public NotXmlFileException(String filePath) {
